@@ -31,10 +31,11 @@ namespace Prolog
 
         // ProcessArgs -- for batch processing. Can be left out if not used
         //if (e.ProcessArgs (args, false)) return;
-
+        
+        // Look for "help" argument. If it is there display the console help and exit
+        if (CheckHelpArg(args)) return;
+        
         SetPreferredConsoleProperties (e, args);
-
-
 
         Console.Title = "C#Prolog command window";
         Console.WriteLine (PrologEngine.IntroText);
@@ -77,18 +78,50 @@ namespace Prolog
     }
 
 
-    #region Console I/O    
+    #region CommandlineHelpOutput
+    static bool CheckHelpArg(string[] args)
+    {
+      bool bIsHelpRequest = false;
+      foreach (string arg in args)
+      {
+        switch(arg)
+        {
+          case "--help":
+              PrintCommandlineHelp();
+              bIsHelpRequest = true;
+              break;
+          default:
+                break;
+        }
+      }
+      return bIsHelpRequest;
+    }
+
+    static void PrintCommandlineHelp()
+    {
+      Console.WriteLine("Help for CSharpProlog Console");
+      Console.WriteLine("Available console startup options: ");
+      Console.WriteLine("--help");
+      Console.WriteLine("   Display this help text.");
+      Console.WriteLine("--theme-light");
+      Console.WriteLine("   Run with the console as a white background and dark font.");
+      Console.WriteLine("--theme-dark");
+      Console.WriteLine("   Run with the console as a dark background and light font.");
+    }
+    #endregion
+
+    #region Console Properties  
     static void SetPreferredConsoleProperties (PrologEngine e, string[] args)
     {
       foreach (string arg in args)
       {
         switch(arg)
         {
-            case "--dark":
+            case "--theme-dark":
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.BackgroundColor = ConsoleColor.Black;
                 break;
-            case "--light":
+            case "--theme-light":
                 Console.ForegroundColor = ConsoleColor.DarkBlue;
                 Console.BackgroundColor = ConsoleColor.White;
                 break;
@@ -103,7 +136,9 @@ namespace Prolog
       // TODO: The following line is supposed to prevent ^C from exiting the application - it doesn't work for linux
       Console.CancelKeyPress += new ConsoleCancelEventHandler (e.Console_CancelKeyPress);
     }
+    #endregion
 
+    #region Console I/O 
     static string ReadQuery ()
     {
       StringBuilder sb = new StringBuilder ();
